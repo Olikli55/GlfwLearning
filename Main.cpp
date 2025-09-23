@@ -13,20 +13,29 @@ const float blockSize= 0.05f;
 // Vertices for the fricking triangle
 GLfloat vertices[] =
 { //               COORDINATOS                  /     COLORES           //
-	-0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
-	 0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower right corner
-	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,     1.0f, 0.6f,  0.32f, // Upper corner
-	-0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner left
-	 0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner right
-	 0.0f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
+	0.0f , 0.0f , 0.0f ,          1.0f, 0.0f, 0.0f,
+	0.0f , 0.05f , 0.0f ,		  1.0f, 0.5f, 0.0f,
+	0.05f , 0.0f , 0.0f ,		  1.0f, 0.5f, 0.2f,
+	0.05f , 0.05f , 0.0f ,		  1.0f, 0.0f, 0.5f,
+
+
+	0.1f , 0.0f , 0.0f ,		  1.0f, 0.5f, 0.2f,
+	0.1f , 0.05f , 0.0f ,		  1.0f, 0.0f, 0.5f,
+	
+
+
+
 };
 
 // Indices for vertices order
 GLuint indices[] =
 {
-	0, 3, 5, // Lower left triangle
-	3, 2, 4, // Lower right triangle
-	5, 4, 1 // Upper triangle
+	0,1,2,
+	1,2,3,
+	2,3,4,
+	3,4,5,
+
+	
 };
 
 
@@ -88,22 +97,29 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		
+		for (int i = 1; i < sizeof(vertices) / sizeof(float); i += 6) {
+			vertices[i] += 0.00001f; // Only update the Y coordinate
+		}
+		
+		
+
+
+		VBO1.Bind();
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		VBO1.Unbind();
+		
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);    // Specify the color of the background
 		glClear(GL_COLOR_BUFFER_BIT);              // Clean the back buffer and assign the new color to it
 		shaderProgram.Activate();				  // activate the sader IDK
 		glUniform1f(uniID, 0.5f);			     // Assigns a value to the uniformNOTE: Must always be done after activating the Shader Program
 		VAO1.Bind();                        	// Bind the VAO so OpenGL knows to use it
 		                                       // Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 		glfwSwapBuffers(window);		// Swap the back buffer with the front buffer
 		glfwPollEvents();			   // Take care of the pooled events 
 	}
 
-	for (unsigned short i = 0; i < 5; i++) {
-        float blockOffset = blockSize * i;
-        // Use blockOffset as needed
-		vertices[0] = 
-    }
+
 
 
 
