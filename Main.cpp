@@ -12,9 +12,20 @@
 const float blockSize = 0.05f;
 
 short grid[20][20];
+struct Vector
+{
+	GLfloat x, y, z;
+};
+
+struct Vertex
+{
+	GLfloat pos[3];
+	GLfloat color[3];
+};
+
 
 // Vertices for the fricking triangle
-std::vector<GLfloat> vertices;
+std::vector<Vertex> vertices;
 
 // Indices for vertices order
 std::vector<GLuint> indices;
@@ -25,23 +36,13 @@ void blockToVerticies(float x, float y);
 
 int main()
 {
-	std::srand(static_cast<unsigned int>(std::time(nullptr))); // Seed RNG
-	blockToVerticies(0.0f, 0.0f);
-
-	for (signed short x = -10; x < 10; x++){
-		for (signed short y = -10; y < 10; y++){
-			if ((std::rand() % 2) == 1) {
-				blockToVerticies(x * 0.05, y * 0.05);
-			}
-			
-
-		}
-	}
-
-
-
+	grid[10][10] = 1;
 	// Initialize GLFW
 	glfwInit();
+	float lastTime = glfwGetTime();
+	float deltaTime = 0.0f;
+	float timer = 0.0f;
+
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);// Tell GLFW what version of OpenGL we are using 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -73,7 +74,7 @@ int main()
 	VAO1.Bind();
 
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices.data(), vertices.size() * sizeof(GLfloat));
+	VBO VBO1(reinterpret_cast<GLfloat*>(vertices.data()), vertices.size() * sizeof(Vertex)); // no fucking idea this gave me chatgtp
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO1(indices.data(), indices.size() * sizeof(GLuint));
 
@@ -91,12 +92,29 @@ int main()
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
+		
 
-		for (unsigned short i = 1; i < vertices.size(); i += 6) {
-			//vertices[i] -= 0.0001f; // Only update the Y coordinate
+		double currentTime = glfwGetTime();
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+		timer += deltaTime;
+		if (timer >= 1.0f) {
+
+			for (short x = -10; x < 10; x++){
+				for (short y = -10; y < 10; y++) {
+					if (grid[x+10][y+10] != 0) {
+						//short temp = grid[x][y];
+						//grid[x][y] = 0;
+						//grid[x][y - 1] = temp;
+						blockToVerticies(x * blockSize, y * blockSize);
+						std::cout << "fdfdffdfd";
+					}
+
+				}
+			}
+
+			timer = 0.0f;
 		}
-
-
 
 
 		VBO1.Bind();
@@ -136,10 +154,12 @@ int main()
 
 
 void blockToVerticies(float x, float y) {
-	vertices.insert(vertices.end(), { x, y, 0.0f, 1.0f, x, y });
-	vertices.insert(vertices.end(), { x, y + blockSize, 0.0f, 1.0f, 0.2f, 0.2f });
-	vertices.insert(vertices.end(), { x + blockSize, y, 0.0f, 1.0f, y, x });
-	vertices.insert(vertices.end(), { x + blockSize, y + blockSize, 0.0f, x, 0.2f, y });
+	Vector color = {1.0, 1.0, 1.0 };
+	vertices.push_back(Vertex{ { x,y,0.0 }, {color.x,color.y,color.z} });
+	vertices.push_back(Vertex{ { x,y + blockSize,0.0 }, {color.x,color.y,color.z} });
+	vertices.push_back(Vertex{ { x + blockSize,y,0.0 }, {color.x,color.y,color.z} });
+	vertices.push_back(Vertex{ { x + blockSize,y + blockSize,0.0 }, {color.x,color.y,color.z} });
+
 
 	GLuint lastINdicie = 0;
 	if (!indices.empty()) {
