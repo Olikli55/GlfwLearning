@@ -1,5 +1,5 @@
 #include<iostream>
-#include<glad/glad.h>
+#include"glad/glad.h"
 #include<GLFW/glfw3.h>
 #include <vector>
 #include"shaderClass.h"
@@ -8,8 +8,9 @@
 #include"EBO.h"
 #include <cstdlib>
 #include <ctime>
+#include "window.h"
 
-const float blockSize = 0.05f;
+const GLfloat blockSize = 0.05f;	
 
 short grid[20][20];
 struct Vector
@@ -36,33 +37,9 @@ void blockToVerticies(float x, float y);
 
 int main()
 {
-	grid[10][10] = 1;
-	// Initialize GLFW
-	glfwInit();
-	float lastTime = glfwGetTime();
-	float deltaTime = 0.0f;
-	float timer = 0.0f;
+	blockToVerticies(0, 0);
 
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);// Tell GLFW what version of OpenGL we are using 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 	// Tell GLFW we are using the CORE profile == modern functions only
-
-	GLFWwindow* window = glfwCreateWindow(1000, 900, "TRIANGEL YAYAYAY", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "ERROR: creation of window faild" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window); // make the window current? i guess i dont fucking now
-
-	gladLoadGL();
-
-
-	glViewport(0, 0, 1000, 900);	// Specify the viewport of OpenGL in the Window. by the way it is FUKCING reversed
-
-
+	Window myWindow(900, 1000);
 
 	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
@@ -88,47 +65,24 @@ int main()
 
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale"); 	// Gets ID of uniform called "scale" no idea why too
 
-
 	// Main loop
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(myWindow.window))
 	{
 		
 
-		double currentTime = glfwGetTime();
-		deltaTime = currentTime - lastTime;
-		lastTime = currentTime;
-		timer += deltaTime;
-		if (timer >= 1.0f) {
-
-			for (short x = -10; x < 10; x++){
-				for (short y = -10; y < 10; y++) {
-					if (grid[x+10][y+10] != 0) {
-						//short temp = grid[x][y];
-						//grid[x][y] = 0;
-						//grid[x][y - 1] = temp;
-						blockToVerticies(x * blockSize, y * blockSize);
-						std::cout << "fdfdffdfd";
-					}
-
-				}
-			}
-
-			timer = 0.0f;
-		}
 
 
-		VBO1.Bind();
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(GLfloat), vertices.data());
-		VBO1.Unbind();
+
+
 
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);    // Specify the color of the background
 		glClear(GL_COLOR_BUFFER_BIT);              // Clean the back buffer and assign the new color to it
 		shaderProgram.Activate();				  // activate the sader IDK
 		glUniform1f(uniID, 0.5f);			     // Assigns a value to the uniformNOTE: Must always be done after activating the Shader Program
 		VAO1.Bind();                        	// Bind the VAO so OpenGL knows to use it
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glfwSwapBuffers(window);		// Swap the back buffer with the front buffer
+											   // Draw primitives, number of indices, datatype of indices, index of indices
+		glDrawElements(GL_TRIANGLES, GLsizei(indices.size()), GL_UNSIGNED_INT, 0);
+		glfwSwapBuffers(myWindow.window);		// Swap the back buffer with the front buffer
 		glfwPollEvents();			   // Take care of the pooled events 
 	}
 
@@ -144,7 +98,7 @@ int main()
 	EBO1.Delete();
 	shaderProgram.Delete();
 	// Delete window before ending the program
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(myWindow.window);
 	// Terminate GLFW tqybgtgtbefore ending the program
 	glfwTerminate();
 	return 0;
@@ -175,3 +129,8 @@ void blockToVerticies(float x, float y) {
 
 
 }
+
+
+
+
+
